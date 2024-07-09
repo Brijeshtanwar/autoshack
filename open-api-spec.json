@@ -1,0 +1,239 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Autoshack Model Prediction API",
+        "version": "2.0.0"
+    },
+    "paths": {
+        "/openapi": {
+            "get": {
+                "summary": "Get the OpenAPI Specification (OAS) API specifications",
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OpenAPISpec"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Invalid API key"
+                    }
+                }
+            }
+        },
+        "/predict": {
+            "post": {
+                "summary": "Predict using a machine learning model",
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InputData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful prediction",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OutputData"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Invalid API key"
+                    }
+                }
+            }
+        },
+        "/aws_credentials": {
+            "post": {
+                "summary": "Store AWS credentials for model retraining",
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AwsCredentialsInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "AWS credentials stored successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AwsCredentialsOutput"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Invalid API key"
+                    }
+                }
+            }
+        },
+        "/retrain": {
+            "post": {
+                "summary": "Retrain the machine learning model",
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RetrainInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Retrain process started in the background"
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid file format or missing file"
+                    },
+                    "401": {
+                        "description": "Unauthorized: Invalid API key"
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Retrain pipeline failed"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "OpenAPISpec": {
+                "type": "object",
+                "properties": {
+                    "openapi": {
+                        "type": "string"
+                    },
+                    "info": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string"
+                            },
+                            "version": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "paths": {
+                        "type": "object"
+                    },
+                    "components": {
+                        "type": "object"
+                    }
+                }
+            },
+            "InputData": {
+                "type": "object",
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    }
+                }
+            },
+            "OutputData": {
+                "type": "object",
+                "properties": {
+                    "confidence_score": {
+                        "type": "number"
+                    },
+                    "predicted_class": {
+                        "type": "string"
+                    }
+                }
+            },
+            "AwsCredentialsInput": {
+                "type": "object",
+                "properties": {
+                    "access_key": {
+                        "type": "string"
+                    },
+                    "secret_key": {
+                        "type": "string"
+                    },
+                    "region": {
+                        "type": "string"
+                    },
+                    "bucket_name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "AwsCredentialsOutput": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "access_key": {
+                        "type": "string"
+                    },
+                    "secret_key": {
+                        "type": "string"
+                    },
+                    "region": {
+                        "type": "string"
+                    },
+                    "bucket_name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "RetrainInput": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "APIKeyAuth": {
+                "type": "apiKey",
+                "in": "header",
+                "name": "X-API-Key"
+            }
+        }
+    }
+}
